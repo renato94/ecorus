@@ -68,7 +68,7 @@
     function updatePerson(personID) {
         var data_obj = {
             name: $('#new-name-' + personID).val(),
-            age: parseInt($('#new-age-' + personID).val())
+            age: $('#new-age-' + personID).val()
         };
         var data = JSON.stringify(data_obj);
         $.ajax({
@@ -80,7 +80,6 @@
             success: function (response) {
                 reloadPersons();
                 reloadOffices();
-                showError(response)
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 showError(jqXHR, textStatus, errorThrown)

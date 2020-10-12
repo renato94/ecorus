@@ -52,14 +52,6 @@
             });
         }
 
-        function hideError() {
-            $('#action-result').addClass('hide');
-        }
-
-        function showError(jqXHR, textStatus, errorThrown) {
-            $('#action-result-errors').val(jqXHR.responseText);
-            $('#action-result').removeClass('hide');
-        }
 
         function createOffice() {
             var data_obj = {name: $('#office-name-id').val()};
@@ -72,11 +64,21 @@
                 data: data,
                 success: function () {
                     reloadOffices();
+                    reloadPersons();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     showError(jqXHR, textStatus, errorThrown)
                 }
             });
+        }
+
+        function hideError() {
+            $('#action-result').addClass('hide');
+        }
+
+        function showError(jqXHR, textStatus, errorThrown) {
+            $('#action-result-errors').val(jqXHR.responseText);
+            $('#action-result').removeClass('hide');
         }
 
         function reloadPersons() {
