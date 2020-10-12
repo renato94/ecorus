@@ -1,5 +1,5 @@
 from flask import Blueprint
 
-bp = Blueprint('api', __name__)
+bp_api = Blueprint('api', __name__)
 
-from api import offices, persons
+from flaskapp.api import offices, persons, helpers

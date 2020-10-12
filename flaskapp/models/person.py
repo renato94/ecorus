@@ -1,13 +1,17 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship
-from database import Base
+from flaskapp.database import Base
+
+
+def to_int(str):
+    return int(str)
 
 
 class PersonValidator(object):
     create_schema = {'name': {'required': True, 'type': 'string', 'minlength': 1, 'maxlength': 50},
-                     'age': {'required': True, 'type': 'integer', 'min': 0, 'max': 100}}
+                     'age': {'required': True, 'type': 'integer', 'coerce': int, 'min': 0, 'max': 100}}
     update_schema = {'name': {'required': False, 'type': 'string', 'minlength': 1, 'maxlength': 50},
-                     'age': {'required': False, 'type': 'integer', 'min': 0, 'max': 100}}
+                     'age': {'required': False, 'type': 'integer', 'coerce': int, 'min': 0, 'max': 100}}
 
 
 class Person(Base):

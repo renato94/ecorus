@@ -11,53 +11,55 @@
   </thead>
   <tbody>
   {% for person in persons %}
-  <tr>
-    <td>{{ person.id }}</td>
-    <td><input type='text' id="new-name" value='{{ person.name  }}'/></td>
-    <td><input type='text' id="new-age" value='{{ person.age  }}'/></td>
+    <tr>
+      <td>{{ person.id }}</td>
+      <td><input type='text' id="new-name-{{ person.id }}" value='{{ person.name }}'/></td>
+      <td><input type='text' id="new-age-{{ person.id }}" value='{{ person.age }}'/></td>
 
-    {% if person.office_id is not none %}
-    {% set office_name = person.office.name %}
-    {% set statusStartWorking = 'disabled' %}
-    {% set statusStopWorking = '' %}
-    {% else %}
-    {% set office_name = "no office" %}
-    {% set statusStartWorking = '' %}
-    {% set statusStopWorking = 'disabled' %}
-    {% endif %}
-    <td>{{ office_name }}</td>
-    <td>
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle {{ statusStartWorking }}" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          company
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          {% for office in offices %}
-          <a class="dropdown-item" onclick="startWorkingFor('{{person.id}}','{{office.id}}')" href="#">{{ office.name
-            }}</a>
-          {% endfor %}
+      {% if person.office_id is not none %}
+        {% set office_name = person.office.name %}
+        {% set statusStartWorking = 'disabled' %}
+        {% set statusStopWorking = '' %}
+      {% else %}
+        {% set office_name = "no office" %}
+        {% set statusStartWorking = '' %}
+        {% set statusStopWorking = 'disabled' %}
+      {% endif %}
+      <td>{{ office_name }}</td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle {{ statusStartWorking }}" type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            company
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            {% for office in offices %}
+              <a class="dropdown-item" onclick="startWorkingFor('{{ person.id }}','{{ office.id }}')"
+                 href="#">{{ office.name }}</a>
+            {% endfor %}
+          </div>
         </div>
-      </div>
-    </td>
-    <td>
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle {{ statusStopWorking }}" type="button" id="dropdownMenuButton"
-                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          company
-        </button>
-        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <a class="dropdown-item" onclick="finishWorkingFor('{{person.id}}')" href="#">{{ person.office.name }}</a>
+      </td>
+      <td>
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle {{ statusStopWorking }}" type="button"
+                  id="dropdownMenuButton"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            company
+          </button>
+          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <a class="dropdown-item" onclick="finishWorkingFor('{{ person.id }}')" href="#">{{ person.office.name }}</a>
+          </div>
         </div>
-      </div>
-    </td>
+      </td>
 
-    <td>
-      <button type="button" onclick="updatePerson('{{ person.id }}')" class="btn btn-primary">Update</button>
-      <button type="button" onclick="deletePerson('{{ person.id }}')" class="btn btn-danger">Delete</button>
+      <td>
+        <button type="button" onclick="updatePerson('{{ person.id }}')" class="btn btn-primary">Update</button>
+        <button type="button" onclick="deletePerson('{{ person.id }}')" class="btn btn-danger">Delete</button>
 
-    </td>
-  </tr>
+      </td>
+    </tr>
   {% endfor %}
   </tbody>
 </table>
@@ -65,8 +67,8 @@
 <script>
     function updatePerson(personID) {
         var data_obj = {
-            name: $('#new-name').val(),
-            age: parseInt($('#new-age').val())
+            name: $('#new-name-' + personID).val(),
+            age: parseInt($('#new-age-' + personID).val())
         };
         var data = JSON.stringify(data_obj);
         $.ajax({
@@ -78,23 +80,23 @@
             success: function (response) {
                 reloadPersons();
                 reloadOffices();
+                showError(response)
             },
-            error: function (error) {
-                console.log(error)
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }
 
     function deletePerson(personID) {
-        console.log(personID);
         $.ajax({
             url: '/api/persons/' + personID,
             type: 'DELETE',
             success: function (response) {
                 reloadPersons();
             },
-            error: function (response) {
-                console.log(response)
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }
@@ -107,8 +109,8 @@
                 reloadPersons();
                 reloadOffices();
             },
-            error: function (response) {
-                console.log(response);
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }
@@ -121,8 +123,8 @@
                 reloadPersons();
                 reloadOffices();
             },
-            error: function (response) {
-                console.log(response);
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }

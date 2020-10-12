@@ -9,16 +9,16 @@
   </thead>
   <tbody>
   {% for office in offices %}
-  <tr>
-    <td id="office_id">{{ office.id }}</td>
-    <td><input type='text' id="new-office-name" value='{{ office.name  }}'/></td>
-    <td>{{ office.people_working_names }}
-    <td>
-      <button type="button" onclick="updateOffice('{{ office.id }}')" class="btn btn-primary">Update</button>
-      <button type="button" onclick="deleteOffice('{{ office.id }}')" class="btn btn-danger">Delete</button>
-    </td>
+    <tr>
+      <td id="office_id">{{ office.id }}</td>
+      <td><input type='text' id="new-office-name" value='{{ office.name }}'/></td>
+      <td>{{ office.people_working_names }}
+      <td>
+        <button type="button" onclick="updateOffice('{{ office.id }}')" class="btn btn-primary">Update</button>
+        <button type="button" onclick="deleteOffice('{{ office.id }}')" class="btn btn-danger">Delete</button>
+      </td>
 
-  </tr>
+    </tr>
   {% endfor %}
   </tbody>
 </table>
@@ -38,22 +38,22 @@
                 reloadPersons();
                 reloadOffices();
             },
-            error: function (error) {
-                console.log(error)
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }
 
-    function getOffice(officeId) {
-        console.log(officeId);
+    function deleteOffice(officeID) {
         $.ajax({
-            url: '/_get_offices',
-            type: 'GET',
+            url: '/api/offices/' + officeID,
+            type: 'DELETE',
             success: function (data) {
-                $("#office-table").load(data);
+                reloadOffices();
+                reloadPersons();
             },
-            error: function (error) {
-                console.log(error)
+            error: function (jqXHR, textStatus, errorThrown) {
+                showError(jqXHR, textStatus, errorThrown)
             }
         })
     }

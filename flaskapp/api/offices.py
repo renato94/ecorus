@@ -1,66 +1,47 @@
 from flask import jsonify, make_response
-from models import Office
-from database import db_session
+from flaskapp.models import Office
+from flaskapp.database import db_session, save_object, delete_object
 from flask import request
-from api import bp
+from flaskapp.api import bp_api
 
 
-@bp.route('/offices', methods=['GET'])
+@bp_api.route('/offices', methods=['GET'])
 def get_offices():
     offices = Office.query.all()
     office_info = [office.to_dict() for office in offices]
     return jsonify({'success': True, 'offices': office_info})
 
 
-@bp.route('/offices/<id>', methods=['GET'])
+@bp_api.route('/offices/<int:id>', methods=['GET'])
 def get_office(id):
     office = Office.query.get(id)
     office_info = office.to_dict() if office else "No office with that ID"
     return make_response(jsonify({'success': True, 'offices': office_info}))
 
 
-@bp.route('/offices', methods=['POST'])
+@bp_api.route('/offices', methods=['POST'])
 def create_office():
     json = request.json
     office = Office(json['name'])
-    try:
-        db_session.add(office)
-        db_session.commit()
-        success = True
-    except:
-        db_session.rollback()
-        success = False
+    success, errors = save_object(office)
+
     return jsonify({'success': success, 'office': office.to_dict()})
 
 
-@bp.route('/offices', methods=['PUT'])
-def update_office():
-    office_id = request.args.get('id', None)
-    office = Office.query.get(int(office_id))
+@bp_api.route('/offices/<int:id>', methods=['PUT'])
+def update_office(id):
+    office = Office.query.get(int(id))
 
-    if not office and office_id:
+    if not office:
         office = Office(name=request.json['name'])
     else:
         office.update(**request.get_json())
-    try:
-        db_session.add(office)
-        db_session.commit()
-        success = True
-    except:
-        db_session.rollback()
-        success = False
-
+    success, errors = save_object(office)
     return jsonify({'success': success, 'office': office.to_dict()})
 
 
-@bp.route('/offices/<int:id>', methods=['DELETE'])
+@bp_api.route('/offices/<int:id>', methods=['DELETE'])
 def delete_office(id):
     office = Office.query.get(id)
-    try:
-        db_session.delete(office)
-        db_session.commit()
-        success = True
-    except:
-        db_session.rollback()
-        success = False
+    success, errors = delete_object(office)
     return jsonify({'success': success})

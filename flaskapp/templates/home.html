@@ -1,104 +1,112 @@
 {% extends "bootstrap/base.html" %}
 {% block content %}
-<nav class="navbar navbar-dark bg-dark">
-  <a class="navbar-brand" href="#">Ecorus</a>
-</nav>
+  <div class="container">
+    <nav class="navbar navbar-light bg-primary">
+      <span class="navbar-brand mb-0 h1">Ecorus</span>
+    </nav>
+    <script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
 
-<script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+    <div id="action-result" class="alert alert-danger hide" onclick="hideError()" role="alert">
+      <input id="action-result-errors" name="" style="width: 100%"></input>
+    </div>
+
+    <div class="input-group" style="display: inline-flex">
+      <input id="person-name-id" type="text" placeholder="Name" class="form-control">
+      <input id="person-age-id" type="integer" placeholder="Age" class="form-control">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" onclick="createPerson()" type="button">Create Person</button>
+      </div>
+    </div>
+
+    <div id="persons-table"></div>
+
+    <div class="input-group mb-3" style="display: inline-flex">
+      <input id="office-name-id" type="text" placeholder="Office name" class="form-control">
+      <div class="input-group-append">
+        <button class="btn btn-outline-secondary" onclick="createOffice()" type="button">Create Office</button>
+      </div>
+    </div>
 
 
-<div class="input-group mb-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text">Name and Age</span>
-  </div>
-  <input id="person-name-id" type="text" placeholder="name" class="form-control">
-  <input id="person-age-id" type="text" placeholder="age" class="form-control">
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary" onclick="createPerson()" type="button">Create Person</button>
-  </div>
-</div>
+    <div id="offices-table"></div>
 
-<div id="persons-table"></div>
+    <script>
+        function createPerson() {
+            var data_obj = new Object();
+            data_obj.name = $('#person-name-id').val();
+            data_obj.age = $('#person-age-id').val();
+            var data = JSON.stringify(data_obj);
 
-<div class="input-group mb-3">
-  <div class="input-group-prepend">
-    <span class="input-group-text">Name</span>
-  </div>
-  <input id="office-name-id" type="text" class="form-control">
-  <div class="input-group-append">
-    <button class="btn btn-outline-secondary" onclick="createOffice()" type="button">Create Office</button>
-  </div>
-</div>
+            $.ajax({
+                url: "/api/persons",
+                dataType: 'json',
+                type: 'POST',
+                contentType: 'application/json',
+                data: data,
+                success: function (response) {
+                    reloadPersons();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    showError(jqXHR, textStatus, errorThrown)
+                }
+            });
+        }
 
-<div id="offices-table"></div>
+        function hideError() {
+            $('#action-result').addClass('hide');
+        }
 
-<script>
-    function createPerson() {
-        var data_obj = new Object();
-        data_obj.name = $('#person-name-id').val();
-        data_obj.age = $('#person-age-id').val();
-        var data = JSON.stringify(data_obj);
+        function showError(jqXHR, textStatus, errorThrown) {
+            $('#action-result-errors').val(jqXHR.responseText);
+            $('#action-result').removeClass('hide');
+        }
 
-        $.ajax({
-            url: "/api/persons",
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: data,
-            success: function (response) {
-                reloadPersons();
-            },
-            error: function (response) {
-                console.log(response)
-            }
+        function createOffice() {
+            var data_obj = {name: $('#office-name-id').val()};
+            var data = JSON.stringify(data_obj);
+            $.ajax({
+                url: "/api/offices",
+                dataType: 'json',
+                type: 'POST',
+                contentType: 'application/json',
+                data: data,
+                success: function () {
+                    reloadOffices();
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    showError(jqXHR, textStatus, errorThrown)
+                }
+            });
+        }
+
+        function reloadPersons() {
+            $.ajax({
+                url: "_get_persons",
+                dataType: 'html',
+                type: 'GET',
+                success: function (response) {
+                    $("#persons-table").html(response);
+                }
+            });
+        }
+
+        function reloadOffices() {
+            $.ajax({
+                url: "_get_offices",
+                dataType: 'html',
+                success: function (response) {
+                    $("#offices-table").html(response);
+
+                }
+            });
+        }
+
+        $(document).ready(function () {
+            reloadPersons();
+            reloadOffices();
         });
 
-    }
+    </script>
+  </div>
 
-    function createOffice() {
-        var data_obj = {name: $('#office-name-id').val()};
-        var data = JSON.stringify(data_obj);
-        $.ajax({
-            url: "/api/offices",
-            dataType: 'json',
-            type: 'POST',
-            contentType: 'application/json',
-            data: data,
-            success: function (response) {
-                reloadOffices();
-            },
-            error: function (response) {
-                console.log(response)
-            }
-        });
-    }
-
-    function reloadPersons() {
-        $.ajax({
-            url: "_get_persons",
-            dataType: 'html',
-            type: 'GET',
-            success: function (response) {
-                $("#persons-table").html(response);
-            }
-        });
-    }
-
-    function reloadOffices() {
-        $.ajax({
-            url: "_get_offices",
-            dataType: 'html',
-            success: function (response) {
-                $("#offices-table").html(response);
-
-            }
-        });
-    }
-
-    $(document).ready(function () {
-        reloadPersons();
-        reloadOffices();
-    });
-
-</script>
 {% endblock %}
