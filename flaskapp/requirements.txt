@@ -1,0 +1,9 @@
+flask
+redis
+Flask-SQLAlchemy
+flask-restful
+mysqlclient
+pymysql
+cerberus
+gunicorn
+flask-bootstrap

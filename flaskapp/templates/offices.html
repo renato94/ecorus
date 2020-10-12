@@ -1,0 +1,60 @@
+<table class="table table-striped table-dark table-hover">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>name</th>
+    <th>People Working
+    <th>
+  <tr>
+  </thead>
+  <tbody>
+  {% for office in offices %}
+  <tr>
+    <td id="office_id">{{ office.id }}</td>
+    <td><input type='text' id="new-office-name" value='{{ office.name  }}'/></td>
+    <td>{{ office.people_working_names }}
+    <td>
+      <button type="button" onclick="updateOffice('{{ office.id }}')" class="btn btn-primary">Update</button>
+      <button type="button" onclick="deleteOffice('{{ office.id }}')" class="btn btn-danger">Delete</button>
+    </td>
+
+  </tr>
+  {% endfor %}
+  </tbody>
+</table>
+
+<script>
+
+    function updateOffice(officeID) {
+        var data_obj = {name: $('#new-office-name').val()};
+        var data = JSON.stringify(data_obj);
+        $.ajax({
+            url: '/api/offices/' + officeID,
+            dataType: 'json',
+            type: 'PUT',
+            data: data,
+            contentType: 'application/json',
+            success: function (response) {
+                reloadPersons();
+                reloadOffices();
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
+    }
+
+    function getOffice(officeId) {
+        console.log(officeId);
+        $.ajax({
+            url: '/_get_offices',
+            type: 'GET',
+            success: function (data) {
+                $("#office-table").load(data);
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
+    }
+</script>

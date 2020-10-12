@@ -1,0 +1,104 @@
+{% extends "bootstrap/base.html" %}
+{% block content %}
+<nav class="navbar navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Ecorus</a>
+</nav>
+
+<script src='https://code.jquery.com/jquery-3.3.1.min.js'></script>
+
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">Name and Age</span>
+  </div>
+  <input id="person-name-id" type="text" placeholder="name" class="form-control">
+  <input id="person-age-id" type="text" placeholder="age" class="form-control">
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" onclick="createPerson()" type="button">Create Person</button>
+  </div>
+</div>
+
+<div id="persons-table"></div>
+
+<div class="input-group mb-3">
+  <div class="input-group-prepend">
+    <span class="input-group-text">Name</span>
+  </div>
+  <input id="office-name-id" type="text" class="form-control">
+  <div class="input-group-append">
+    <button class="btn btn-outline-secondary" onclick="createOffice()" type="button">Create Office</button>
+  </div>
+</div>
+
+<div id="offices-table"></div>
+
+<script>
+    function createPerson() {
+        var data_obj = new Object();
+        data_obj.name = $('#person-name-id').val();
+        data_obj.age = $('#person-age-id').val();
+        var data = JSON.stringify(data_obj);
+
+        $.ajax({
+            url: "/api/persons",
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: data,
+            success: function (response) {
+                reloadPersons();
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        });
+
+    }
+
+    function createOffice() {
+        var data_obj = {name: $('#office-name-id').val()};
+        var data = JSON.stringify(data_obj);
+        $.ajax({
+            url: "/api/offices",
+            dataType: 'json',
+            type: 'POST',
+            contentType: 'application/json',
+            data: data,
+            success: function (response) {
+                reloadOffices();
+            },
+            error: function (response) {
+                console.log(response)
+            }
+        });
+    }
+
+    function reloadPersons() {
+        $.ajax({
+            url: "_get_persons",
+            dataType: 'html',
+            type: 'GET',
+            success: function (response) {
+                $("#persons-table").html(response);
+            }
+        });
+    }
+
+    function reloadOffices() {
+        $.ajax({
+            url: "_get_offices",
+            dataType: 'html',
+            success: function (response) {
+                $("#offices-table").html(response);
+
+            }
+        });
+    }
+
+    $(document).ready(function () {
+        reloadPersons();
+        reloadOffices();
+    });
+
+</script>
+{% endblock %}
